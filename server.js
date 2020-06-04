@@ -27,38 +27,29 @@ try {
   console.error("Unable to connect to the database:", error);
 }
 
-// Some fake data
-const books = [
-  {
-    title: "Harry Potter and the Sorcerer's stone",
-    author: "J.K. Rowling",
-  },
-  {
-    title: "Jurassic Park",
-    author: "Michael Crichton",
-  },
-];
-
 // The GraphQL schema in string form
 const typeDefs = gql`
   type Query {
-    books: [Book]
+    books: [NPMSC_TROUBLE]
   }
-  type Book {
-    title: String
-    author: String
+  type NPMSC_TROUBLE {
+    No: String
+    Block: String
+    Trouble: String
+    Cause: String
   }
 `;
 
 // The resolvers
 const resolvers = {
-  Query: { books: () => books },
+  Query: { books: async () => sequelize.books.findAll() },
 };
 
 // Put together a schema
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  // modules: [require("./models/index")],
   playground: {
     endpoint: `http://localhost:3000/graphql`,
     settings: {
