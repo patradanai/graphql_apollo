@@ -3,7 +3,8 @@ const list = (sequelize, DataTypes) => {
     "NMPSC_TROUBLE",
     {
       No: {
-        type: DataTypes.TEXT(10),
+        type: DataTypes.STRING,
+        primaryKey: true,
         allowNull: true,
       },
       Block: {
@@ -20,8 +21,8 @@ const list = (sequelize, DataTypes) => {
       },
     },
     {
-      tableName: "NMPSC_TROUBLE",
       timestamps: false,
+      freezeTableName: true,
     }
   );
 };

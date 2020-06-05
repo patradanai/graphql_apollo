@@ -1,4 +1,5 @@
 const { Sequelize } = require("sequelize");
+let db = {};
 
 const sequelize = new Sequelize("MT700PDDB", "sa", "qwerty@1", {
   host: "172.16.73.146",
@@ -13,16 +14,20 @@ const sequelize = new Sequelize("MT700PDDB", "sa", "qwerty@1", {
   dialectOptions: {
     options: {
       enableArithAbort: true,
-      trustServerCertificate: true,
+      trustServerCertificate: false,
     },
+    operatorsAliases: false,
   },
 });
 
-const models = {
-  List: sequelize.import("./list.js"),
-};
+const models = ["./list.js"];
 
-module.exports = {
-  sequelize,
-  models,
-};
+models.forEach((payload) => {
+  let model = sequelize.import(payload);
+  db[model.name] = model;
+});
+
+db.sequelize = sequelize;
+db.Sequelize = Sequelize;
+
+module.exports = db;

@@ -1,30 +1,16 @@
 const express = require("express");
-const { ApolloServer, gql } = require("apollo-server-express");
+const { ApolloServer } = require("apollo-server-express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
 const db = require("./models");
-
-// The GraphQL schema in string form
-const typeDefs = gql`
-  type Query {
-    books: [NPMSC_TROUBLE]
-  }
-  type NPMSC_TROUBLE {
-    No: String
-    Block: String
-    Trouble: String
-    Cause: String
-  }
-`;
-
-// The resolvers
-const resolvers = {
-  Query: { books: async () => await models.List.findAll() },
-};
+const typeDefs = require("./typeDefs");
+const resolvers = require("./resolvers");
 
 // Put together a schema
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: db.models,
+  context: { db },
   playground: {
     endpoint: `http://localhost:3000/graphql`,
     settings: {
@@ -35,21 +21,17 @@ const server = new ApolloServer({
 
 // Initialize the app
 const app = express();
-
+app.use(cors());
+app.use(bodyParser.json());
 server.applyMiddleware({ app });
 
-try {
-  db.sequelize.authenticate();
-  console.log("Connection has been established successfully.");
-} catch (err) {
-  console.error("Unable to connect to the database:", err);
-}
+db.sequelize.authenticate();
 
-db.sequelize.sync().then();
+db.sequelize.sync().then(() => {
+  // Start the server
+  app.listen(3000, () => {
+    console.log("Go to http://localhost:3000/graphql to run queries!");
+  });
+});
 
 // The GraphQL endpoint
-
-// Start the server
-app.listen(3000, () => {
-  console.log("Go to http://localhost:3000/graphiql to run queries!");
-});
